@@ -225,11 +225,13 @@ const App = {
     const jobCount = this.jobs.filter(j => j.status === 'offen').length;
     el.innerHTML = `
       <section class="hero">
-        <h1>Finde deinen nächsten <em>Nebenjob</em></h1>
-        <p>Biete Jobs an oder finde flexible Nebenjobs in deiner Nähe. Einfach, schnell und unkompliziert.</p>
-        <div class="hero-actions">
-          <a href="#jobs" class="btn btn-primary">Jobs durchsuchen (${jobCount})</a>
-          <a href="#new" class="btn btn-secondary">Job anbieten</a>
+        <div class="hero-inner">
+          <h1>Finde deinen nächsten <em>Nebenjob</em></h1>
+          <p>Biete Jobs an oder finde flexible Nebenjobs in deiner Nähe. Einfach, schnell und unkompliziert.</p>
+          <div class="hero-actions">
+            <a href="#jobs" class="btn btn-primary">Jobs durchsuchen (${jobCount})</a>
+            <a href="#new" class="btn btn-secondary" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3)">Job anbieten</a>
+          </div>
         </div>
       </section>
 

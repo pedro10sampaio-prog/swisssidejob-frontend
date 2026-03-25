@@ -130,7 +130,17 @@ input, select, textarea { font: inherit; }
 /* ===== Hero ===== */
 .hero {
   text-align: center;
-  padding: 80px 24px 60px;
+  padding: 100px 24px 80px;
+  max-width: 100%;
+  margin: 0 auto;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80&fit=crop');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.hero-inner {
   max-width: 720px;
   margin: 0 auto;
 }
@@ -138,21 +148,23 @@ input, select, textarea { font: inherit; }
 .hero h1 {
   font-size: 2.75rem;
   font-weight: 800;
-  color: var(--gray-900);
+  color: #ffffff;
   line-height: 1.15;
   margin-bottom: 16px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .hero h1 em {
   font-style: normal;
-  color: var(--primary);
+  color: #60a5fa;
 }
 
 .hero p {
   font-size: 1.15rem;
-  color: var(--gray-500);
+  color: rgba(255,255,255,0.85);
   max-width: 520px;
   margin: 0 auto 32px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
 .hero-actions {

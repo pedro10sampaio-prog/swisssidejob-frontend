@@ -256,26 +256,56 @@ const App = {
         </div>
       </section>
 
+      <!-- SEKTION: Hilfe finden -->
       <section class="how-it-works" style="padding-top:0">
-        <h2 style="text-align:center;font-size:1.75rem;font-weight:700;margin-bottom:32px;color:var(--gray-900)">Wer macht's, wenn du keine Zeit hast?</h2>
+        <h2 style="text-align:center;font-size:1.75rem;font-weight:700;margin-bottom:8px;color:var(--gray-900)">Dein Leben ist voll genug.</h2>
+        <p style="text-align:center;font-size:1.05rem;color:var(--gray-500);margin-bottom:36px;max-width:600px;margin-left:auto;margin-right:auto">Lass andere das erledigen, wofür dir die Zeit fehlt – und geniess den Moment.</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:900px;margin:0 auto">
           <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
             <p style="font-size:1.8rem;margin-bottom:12px">📦</p>
-            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Umzug steht an?</h3>
-            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Schwere Kisten, enger Treppenaufgang, keine Helfer in Sicht? Finde kräftige Unterstützung in deiner Nähe – schnell und unkompliziert.</p>
+            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Umzug? Stressfrei erledigt.</h3>
+            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Schwere Möbel, enger Treppenaufgang, null Bock auf Rückenschmerzen? Lehn dich zurück – jemand in deiner Nähe packt das für dich.</p>
           </div>
           <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
             <p style="font-size:1.8rem;margin-bottom:12px">🐕</p>
-            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Dein Hund wartet auf seinen Spaziergang</h3>
-            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Langer Arbeitstag, aber dein Vierbeiner braucht Auslauf? Finde zuverlässige Hundesitter, die sich liebevoll kümmern.</p>
+            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Dein Hund vermisst die frische Luft.</h3>
+            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">12-Stunden-Tag und schlechtes Gewissen? Muss nicht sein. Finde jemanden, der deinen Vierbeiner so liebt wie du.</p>
           </div>
           <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
             <p style="font-size:1.8rem;margin-bottom:12px">✨</p>
-            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Saubere Wohnung, null Aufwand</h3>
-            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Zwischen Job, Familie und Freizeit bleibt keine Zeit zum Putzen? Lass dir helfen – regelmässig oder einmalig, ganz wie du willst.</p>
+            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Heimkommen und durchatmen.</h3>
+            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Stell dir vor, du kommst nach Hause und alles glänzt. Kein Putzen, kein Stress – einfach ankommen und geniessen.</p>
           </div>
         </div>
-        <p style="text-align:center;margin-top:24px;font-size:1rem;color:var(--gray-600)">Egal was ansteht – auf <strong style="color:var(--primary)">SwissSideJob</strong> findest du die richtige Hilfe.</p>
+        <div style="text-align:center;margin-top:28px">
+          <a href="#jobs" class="btn btn-primary">Hilfe finden</a>
+        </div>
+      </section>
+
+      <!-- SEKTION: Geld verdienen -->
+      <section class="how-it-works" style="padding-top:20px">
+        <h2 style="text-align:center;font-size:1.75rem;font-weight:700;margin-bottom:8px;color:var(--gray-900)">Dein nächster Urlaub finanziert sich nicht von allein.</h2>
+        <p style="text-align:center;font-size:1.05rem;color:var(--gray-500);margin-bottom:36px;max-width:600px;margin-left:auto;margin-right:auto">Ob Traumreise, neues iPhone oder einfach etwas Extra-Geld – mit SwissSideJob verdienst du es dir flexibel dazu.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:900px;margin:0 auto">
+          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
+            <p style="font-size:1.8rem;margin-bottom:12px">🏖️</p>
+            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Spar dir den Traumurlaub zusammen.</h3>
+            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Bali, Mallorca oder einfach mal raus? Jeden Job den du hier machst, bringt dich deinem Ziel ein Stück näher. Geld verdienen nach deinem Zeitplan.</p>
+          </div>
+          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
+            <p style="font-size:1.8rem;margin-bottom:12px">🎯</p>
+            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Endlich das kaufen, worauf du sparst.</h3>
+            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Neues MacBook, Führerschein oder die erste eigene Wohnung? Hör auf zu warten. Nimm einen Nebenjob an und mach es möglich.</p>
+          </div>
+          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
+            <p style="font-size:1.8rem;margin-bottom:12px">💪</p>
+            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Arbeite wann du willst. Nicht wann du musst.</h3>
+            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Kein Chef, keine festen Zeiten. Du entscheidest welchen Job du annimmst und wann. Perfekt neben Studium, Hauptjob oder Familie.</p>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:28px">
+          <a href="#register" class="btn btn-primary">Jetzt Geld verdienen</a>
+        </div>
       </section>
 
       <div class="footer">2026 SwissSideJob. Alle Rechte vorbehalten.</div>`;

@@ -8,6 +8,20 @@ const App = {
   currentUser: null,
   jobs: [],
   nextId: 1,
+  favorites: [],
+
+  // Category icons
+  categoryIcons: {
+    'Garten': '🌿',
+    'Haushalt': '🏠',
+    'Transport': '🚚',
+    'Nachhilfe': '📚',
+    'Haustiere': '🐾',
+    'Digital': '💻',
+    'Handwerk': '🔧',
+    'Events': '🎉',
+    'Sonstiges': '📋',
+  },
 
   // Known city coordinates for radius search (Switzerland)
   cityCoords: {
@@ -68,12 +82,33 @@ const App = {
     this.jobs = JSON.parse(localStorage.getItem('sj_jobs') || '[]');
     this.currentUser = JSON.parse(localStorage.getItem('sj_user') || 'null');
     this.nextId = parseInt(localStorage.getItem('sj_nextId') || '100');
+    this.favorites = JSON.parse(localStorage.getItem('sj_favorites') || '[]');
   },
 
   saveData() {
     localStorage.setItem('sj_jobs', JSON.stringify(this.jobs));
     localStorage.setItem('sj_user', JSON.stringify(this.currentUser));
     localStorage.setItem('sj_nextId', String(this.nextId));
+    localStorage.setItem('sj_favorites', JSON.stringify(this.favorites));
+  },
+
+  // --- Favorites ---
+  toggleFavorite(id, e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    const idx = this.favorites.indexOf(id);
+    if (idx > -1) {
+      this.favorites.splice(idx, 1);
+      this.toast('Von Favoriten entfernt', '');
+    } else {
+      this.favorites.push(id);
+      this.toast('Zu Favoriten hinzugefügt', 'success');
+    }
+    this.saveData();
+    this.router();
+  },
+
+  isFavorite(id) {
+    return this.favorites.includes(id);
   },
 
   // --- Jobs vom Backend laden ---
@@ -103,6 +138,7 @@ const App = {
         priceType: 'pauschal',
         postedBy: 'Maria S.',
         date: '2026-03-20',
+        deadline: '2026-04-05',
         status: 'offen'
       },
       {
@@ -115,6 +151,7 @@ const App = {
         priceType: 'stunde',
         postedBy: 'Thomas K.',
         date: '2026-03-18',
+        deadline: '',
         status: 'offen'
       },
       {
@@ -127,6 +164,7 @@ const App = {
         priceType: 'stunde',
         postedBy: 'Lisa M.',
         date: '2026-03-22',
+        deadline: '2026-04-05',
         status: 'offen'
       },
       {
@@ -139,6 +177,7 @@ const App = {
         priceType: 'stunde',
         postedBy: 'Frank W.',
         date: '2026-03-21',
+        deadline: '',
         status: 'offen'
       },
       {
@@ -151,6 +190,7 @@ const App = {
         priceType: 'pauschal',
         postedBy: 'Anna B.',
         date: '2026-03-19',
+        deadline: '2026-04-15',
         status: 'offen'
       },
       {
@@ -163,6 +203,7 @@ const App = {
         priceType: 'stunde',
         postedBy: 'Jan P.',
         date: '2026-03-23',
+        deadline: '',
         status: 'offen'
       }
     ];
@@ -191,6 +232,7 @@ const App = {
       case 'pricing': this.renderPricing(main); break;
       case 'login': this.renderLogin(main); break;
       case 'register': this.renderRegister(main); break;
+      case 'favorites': this.renderFavorites(main); break;
       default: this.renderHome(main);
     }
     window.scrollTo(0, 0);
@@ -199,9 +241,11 @@ const App = {
   // --- Navbar ---
   renderNavbar() {
     const nav = document.getElementById('navbar');
+    const favCount = this.favorites.length;
     const userLinks = this.currentUser
       ? `<a href="#jobs">Jobs finden</a>
          <a href="#pricing">Preise</a>
+         <a href="#favorites" style="position:relative">Favoriten${favCount ? `<span style="position:absolute;top:-4px;right:-8px;background:var(--red);color:#fff;font-size:.65rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center">${favCount}</span>` : ''}</a>
          <a href="#new" class="btn-primary">Job anbieten</a>
          <a href="#my-jobs">Meine Jobs</a>
          <button onclick="App.logout()">Abmelden</button>`
@@ -220,36 +264,111 @@ const App = {
       </div>`;
   },
 
+  // --- Footer ---
+  footerHtml() {
+    return `
+      <footer class="footer-full">
+        <div class="footer-inner">
+          <div class="footer-col">
+            <div class="footer-logo">Swiss<span>SideJob</span></div>
+            <p class="footer-desc">Die Plattform für Nebenjobs in der Schweiz. Einfach, schnell und unkompliziert.</p>
+            <div class="footer-social">
+              <a href="#" aria-label="Instagram" class="social-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+              </a>
+              <a href="#" aria-label="LinkedIn" class="social-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-4 0v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              </a>
+              <a href="#" aria-label="Twitter/X" class="social-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l16 16M20 4L4 20"/></svg>
+              </a>
+            </div>
+          </div>
+          <div class="footer-col">
+            <h4>Plattform</h4>
+            <a href="#jobs">Jobs finden</a>
+            <a href="#new">Job anbieten</a>
+            <a href="#pricing">Preise</a>
+            <a href="#register">Registrieren</a>
+          </div>
+          <div class="footer-col">
+            <h4>Kategorien</h4>
+            <a href="#jobs">Haushalt</a>
+            <a href="#jobs">Garten</a>
+            <a href="#jobs">Transport</a>
+            <a href="#jobs">Nachhilfe</a>
+          </div>
+          <div class="footer-col">
+            <h4>Rechtliches</h4>
+            <a href="#">Impressum</a>
+            <a href="#">Datenschutz</a>
+            <a href="#">AGB</a>
+            <a href="#">Kontakt</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2026 SwissSideJob. Alle Rechte vorbehalten. Made with ❤️ in der Schweiz 🇨🇭</p>
+          <div class="footer-trust">
+            <span>🔒 SSL verschlüsselt</span>
+            <span>💳 Stripe Payments</span>
+            <span>🇨🇭 Schweizer Plattform</span>
+          </div>
+        </div>
+      </footer>`;
+  },
+
   // --- Home Page ---
   renderHome(el) {
     const jobCount = this.jobs.filter(j => j.status === 'offen').length;
+    const userCount = 150 + Math.floor(Math.random() * 50);
+    const completedCount = 80 + Math.floor(Math.random() * 30);
+
     el.innerHTML = `
       <section class="hero">
         <div class="hero-inner">
           <h1>Finde deinen nächsten <em>Nebenjob</em></h1>
           <p>Biete Jobs an oder finde flexible Nebenjobs in deiner Nähe. Einfach, schnell und unkompliziert.</p>
           <div class="hero-actions">
-            <a href="#jobs" class="btn btn-primary">Jobs durchsuchen (${jobCount})</a>
-            <a href="#new" class="btn btn-secondary" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3)">Job anbieten</a>
+            <a href="#jobs" class="btn btn-primary btn-lg">Jobs durchsuchen</a>
+            <a href="#new" class="btn btn-hero-secondary">Job anbieten</a>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="hero-stat-number" data-target="${jobCount}">${jobCount}</span>
+              <span class="hero-stat-label">Offene Jobs</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-number" data-target="${userCount}">${userCount}+</span>
+              <span class="hero-stat-label">Registrierte Nutzer</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-number" data-target="${completedCount}">${completedCount}+</span>
+              <span class="hero-stat-label">Erledigte Jobs</span>
+            </div>
+          </div>
+          <div class="hero-trust">
+            <span>🔒 Sichere Zahlungen</span>
+            <span>⚡ Sofort loslegen</span>
+            <span>🇨🇭 100% Schweiz</span>
           </div>
         </div>
       </section>
 
-      <section class="how-it-works">
+      <section class="section-animate how-it-works">
         <h2>So funktioniert's</h2>
         <div class="steps">
           <div class="step">
-            <div class="step-icon">1</div>
+            <div class="step-icon">📝</div>
             <h3>Registrieren</h3>
             <p>Erstelle kostenlos ein Konto in wenigen Sekunden.</p>
           </div>
           <div class="step">
-            <div class="step-icon">2</div>
+            <div class="step-icon">🔍</div>
             <h3>Job finden oder anbieten</h3>
             <p>Durchsuche Angebote oder erstelle selbst einen Job.</p>
           </div>
           <div class="step">
-            <div class="step-icon">3</div>
+            <div class="step-icon">🤝</div>
             <h3>Kontakt aufnehmen</h3>
             <p>Bewirb dich direkt oder wähle den besten Bewerber.</p>
           </div>
@@ -257,58 +376,89 @@ const App = {
       </section>
 
       <!-- SEKTION: Hilfe finden -->
-      <section class="how-it-works" style="padding-top:0">
-        <h2 style="text-align:center;font-size:1.75rem;font-weight:700;margin-bottom:8px;color:var(--gray-900)">Dein Leben ist voll genug.</h2>
-        <p style="text-align:center;font-size:1.05rem;color:var(--gray-500);margin-bottom:36px;max-width:600px;margin-left:auto;margin-right:auto">Lass andere das erledigen, wofür dir die Zeit fehlt – und geniess den Moment.</p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:900px;margin:0 auto">
-          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
-            <p style="font-size:1.8rem;margin-bottom:12px">📦</p>
-            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Umzug? Stressfrei erledigt.</h3>
-            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Schwere Möbel, enger Treppenaufgang, null Bock auf Rückenschmerzen? Lehn dich zurück – jemand in deiner Nähe packt das für dich.</p>
+      <section class="section-animate how-it-works" style="padding-top:0">
+        <h2 class="section-title">Dein Leben ist voll genug.</h2>
+        <p class="section-subtitle">Lass andere das erledigen, wofür dir die Zeit fehlt – und geniess den Moment.</p>
+        <div class="card-grid">
+          <div class="feature-card">
+            <div class="feature-icon">📦</div>
+            <h3>Umzug? Stressfrei erledigt.</h3>
+            <p>Schwere Möbel, enger Treppenaufgang, null Bock auf Rückenschmerzen? Lehn dich zurück – jemand in deiner Nähe packt das für dich.</p>
           </div>
-          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
-            <p style="font-size:1.8rem;margin-bottom:12px">🐕</p>
-            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Dein Hund vermisst die frische Luft.</h3>
-            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">12-Stunden-Tag und schlechtes Gewissen? Muss nicht sein. Finde jemanden, der deinen Vierbeiner so liebt wie du.</p>
+          <div class="feature-card">
+            <div class="feature-icon">🐕</div>
+            <h3>Dein Hund vermisst die frische Luft.</h3>
+            <p>12-Stunden-Tag und schlechtes Gewissen? Muss nicht sein. Finde jemanden, der deinen Vierbeiner so liebt wie du.</p>
           </div>
-          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
-            <p style="font-size:1.8rem;margin-bottom:12px">✨</p>
-            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Heimkommen und durchatmen.</h3>
-            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Stell dir vor, du kommst nach Hause und alles glänzt. Kein Putzen, kein Stress – einfach ankommen und geniessen.</p>
+          <div class="feature-card">
+            <div class="feature-icon">✨</div>
+            <h3>Heimkommen und durchatmen.</h3>
+            <p>Stell dir vor, du kommst nach Hause und alles glänzt. Kein Putzen, kein Stress – einfach ankommen und geniessen.</p>
           </div>
         </div>
-        <div style="text-align:center;margin-top:28px">
+        <div style="text-align:center;margin-top:32px">
           <a href="#jobs" class="btn btn-primary">Hilfe finden</a>
         </div>
       </section>
 
       <!-- SEKTION: Geld verdienen -->
-      <section class="how-it-works" style="padding-top:20px">
-        <h2 style="text-align:center;font-size:1.75rem;font-weight:700;margin-bottom:8px;color:var(--gray-900)">Dein nächster Urlaub finanziert sich nicht von allein.</h2>
-        <p style="text-align:center;font-size:1.05rem;color:var(--gray-500);margin-bottom:36px;max-width:600px;margin-left:auto;margin-right:auto">Ob Traumreise, neues iPhone oder einfach etwas Extra-Geld – mit SwissSideJob verdienst du es dir flexibel dazu.</p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:900px;margin:0 auto">
-          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
-            <p style="font-size:1.8rem;margin-bottom:12px">🏖️</p>
-            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Spar dir den Traumurlaub zusammen.</h3>
-            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Bali, Mallorca oder einfach mal raus? Jeden Job den du hier machst, bringt dich deinem Ziel ein Stück näher. Geld verdienen nach deinem Zeitplan.</p>
+      <section class="section-animate how-it-works" style="padding-top:20px">
+        <h2 class="section-title">Dein nächster Urlaub finanziert sich nicht von allein.</h2>
+        <p class="section-subtitle">Ob Traumreise, neues iPhone oder einfach etwas Extra-Geld – mit SwissSideJob verdienst du es dir flexibel dazu.</p>
+        <div class="card-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🏖️</div>
+            <h3>Spar dir den Traumurlaub zusammen.</h3>
+            <p>Bali, Mallorca oder einfach mal raus? Jeden Job den du hier machst, bringt dich deinem Ziel ein Stück näher. Geld verdienen nach deinem Zeitplan.</p>
           </div>
-          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
-            <p style="font-size:1.8rem;margin-bottom:12px">🎯</p>
-            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Endlich das kaufen, worauf du sparst.</h3>
-            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Neues MacBook, Führerschein oder die erste eigene Wohnung? Hör auf zu warten. Nimm einen Nebenjob an und mach es möglich.</p>
+          <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Endlich das kaufen, worauf du sparst.</h3>
+            <p>Neues MacBook, Führerschein oder die erste eigene Wohnung? Hör auf zu warten. Nimm einen Nebenjob an und mach es möglich.</p>
           </div>
-          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px">
-            <p style="font-size:1.8rem;margin-bottom:12px">💪</p>
-            <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--gray-900)">Arbeite wann du willst. Nicht wann du musst.</h3>
-            <p style="font-size:.9rem;color:var(--gray-500);line-height:1.6">Kein Chef, keine festen Zeiten. Du entscheidest welchen Job du annimmst und wann. Perfekt neben Studium, Hauptjob oder Familie.</p>
+          <div class="feature-card">
+            <div class="feature-icon">💪</div>
+            <h3>Arbeite wann du willst. Nicht wann du musst.</h3>
+            <p>Kein Chef, keine festen Zeiten. Du entscheidest welchen Job du annimmst und wann. Perfekt neben Studium, Hauptjob oder Familie.</p>
           </div>
         </div>
-        <div style="text-align:center;margin-top:28px">
+        <div style="text-align:center;margin-top:32px">
           <a href="#register" class="btn btn-primary">Jetzt Geld verdienen</a>
         </div>
       </section>
 
-      <div class="footer">2026 SwissSideJob. Alle Rechte vorbehalten.</div>`;
+      <!-- Kategorien Übersicht -->
+      <section class="section-animate how-it-works" style="padding-top:0">
+        <h2 class="section-title">Beliebte Kategorien</h2>
+        <p class="section-subtitle">Von Haushalt bis Digital – finde den passenden Nebenjob.</p>
+        <div class="category-grid">
+          ${Object.entries(this.categoryIcons).map(([name, icon]) => {
+            const count = this.jobs.filter(j => j.category === name && j.status === 'offen').length;
+            return `<a href="#jobs" class="category-card" onclick="setTimeout(()=>{const s=document.getElementById('categoryFilter');if(s){s.value='${name}';App.filterJobs();}},100)">
+              <span class="category-card-icon">${icon}</span>
+              <span class="category-card-name">${name}</span>
+              <span class="category-card-count">${count} Job${count !== 1 ? 's' : ''}</span>
+            </a>`;
+          }).join('')}
+        </div>
+      </section>
+
+      ${this.footerHtml()}`;
+
+    // Animate sections on scroll
+    this.initScrollAnimations();
+  },
+
+  initScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.section-animate').forEach(el => observer.observe(el));
   },
 
   // --- Jobs Listing ---
@@ -320,7 +470,7 @@ const App = {
           <input type="text" id="searchInput" placeholder="Job suchen..." oninput="App.filterJobs()">
           <select id="categoryFilter" onchange="App.filterJobs()">
             <option value="">Alle Kategorien</option>
-            ${categories.map(c => `<option value="${c}">${c}</option>`).join('')}
+            ${categories.map(c => `<option value="${c}">${this.categoryIcons[c] || ''} ${c}</option>`).join('')}
           </select>
           <select id="typeFilter" onchange="App.filterJobs()">
             <option value="">Alle Typen</option>
@@ -329,7 +479,7 @@ const App = {
           </select>
         </div>
         <div class="search-bar" style="margin-top:12px">
-          <input type="text" id="locationInput" placeholder="Ort eingeben (z.B. Zürich)" oninput="App.filterJobs()">
+          <input type="text" id="locationInput" placeholder="📍 Ort eingeben (z.B. Zürich)" oninput="App.filterJobs()">
           <select id="radiusFilter" onchange="App.filterJobs()">
             <option value="">Umkreis (beliebig)</option>
             <option value="10">10 km</option>
@@ -338,12 +488,24 @@ const App = {
             <option value="100">100 km</option>
             <option value="200">200 km</option>
           </select>
+          <select id="priceFilter" onchange="App.filterJobs()">
+            <option value="">Alle Preise</option>
+            <option value="0-20">Bis 20 CHF</option>
+            <option value="20-50">20 – 50 CHF</option>
+            <option value="50-100">50 – 100 CHF</option>
+            <option value="100-999999">Über 100 CHF</option>
+          </select>
+          <select id="sortFilter" onchange="App.filterJobs()">
+            <option value="newest">Neueste zuerst</option>
+            <option value="price-asc">Preis aufsteigend</option>
+            <option value="price-desc">Preis absteigend</option>
+          </select>
         </div>
       </section>
       <section class="jobs-section">
         <div class="jobs-grid" id="jobsGrid"></div>
       </section>
-      <div class="footer">2026 SwissSideJob. Alle Rechte vorbehalten.</div>`;
+      ${this.footerHtml()}`;
     this.filterJobs();
   },
 
@@ -353,6 +515,8 @@ const App = {
     const type = document.getElementById('typeFilter')?.value || '';
     const locInput = (document.getElementById('locationInput')?.value || '').trim().toLowerCase();
     const radius = parseInt(document.getElementById('radiusFilter')?.value || '0');
+    const priceRange = document.getElementById('priceFilter')?.value || '';
+    const sort = document.getElementById('sortFilter')?.value || 'newest';
 
     let filtered = this.jobs.filter(j => j.status === 'offen');
     if (q) filtered = filtered.filter(j =>
@@ -362,6 +526,12 @@ const App = {
     );
     if (cat) filtered = filtered.filter(j => j.category === cat);
     if (type) filtered = filtered.filter(j => j.type === type);
+
+    // Price filter
+    if (priceRange) {
+      const [min, max] = priceRange.split('-').map(Number);
+      filtered = filtered.filter(j => j.price >= min && j.price <= max);
+    }
 
     if (locInput) {
       const searchCoords = this.getCoordsForLocation(locInput);
@@ -378,6 +548,11 @@ const App = {
       }
     }
 
+    // Sorting
+    if (sort === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+    else if (sort === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+    else filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
     const grid = document.getElementById('jobsGrid');
     if (!grid) return;
 
@@ -392,16 +567,25 @@ const App = {
     grid.innerHTML = filtered.map(j => `
       <a href="#job/${j.id}" class="job-card">
         <div class="job-card-header">
-          <h3>${this.esc(j.title)}</h3>
-          <span class="badge ${j.type === 'regelmaessig' ? 'badge-blue' : 'badge-green'}">${j.type === 'regelmaessig' ? 'Regelmässig' : 'Einmalig'}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="job-card-cat-icon">${this.categoryIcons[j.category] || '📋'}</span>
+            <h3>${this.esc(j.title)}</h3>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="btn-fav ${this.isFavorite(j.id) ? 'active' : ''}" onclick="App.toggleFavorite(${j.id}, event)" title="Merken">
+              ${this.isFavorite(j.id) ? '❤️' : '🤍'}
+            </button>
+            <span class="badge ${j.type === 'regelmaessig' ? 'badge-blue' : 'badge-green'}">${j.type === 'regelmaessig' ? 'Regelmässig' : 'Einmalig'}</span>
+          </div>
         </div>
         <div class="job-card-body">
           <p>${this.esc(j.description.slice(0, 120))}${j.description.length > 120 ? '...' : ''}</p>
           <div class="job-meta">
-            <span>${this.esc(j.location)}</span>
-            ${j._distance !== undefined ? `<span>${j._distance} km entfernt</span>` : ''}
-            <span>${this.esc(j.category)}</span>
-            <span>${this.esc(j.postedBy)}</span>
+            <span>📍 ${this.esc(j.location)}</span>
+            ${j._distance !== undefined ? `<span>📏 ${j._distance} km</span>` : ''}
+            <span>${this.categoryIcons[j.category] || ''} ${this.esc(j.category)}</span>
+            <span>👤 ${this.esc(j.postedBy)}</span>
+            ${j.deadline ? `<span>📅 Bis ${j.deadline}</span>` : ''}
           </div>
         </div>
         <div class="job-card-footer">
@@ -409,6 +593,46 @@ const App = {
           <span class="btn btn-primary btn-sm">Ansehen</span>
         </div>
       </a>`).join('');
+  },
+
+  // --- Favorites Page ---
+  renderFavorites(el) {
+    if (!this.currentUser) {
+      location.hash = '#login';
+      return;
+    }
+    const favJobs = this.jobs.filter(j => this.favorites.includes(j.id));
+    el.innerHTML = `
+      <div class="page-header">
+        <h1>Meine Favoriten</h1>
+        <p>${favJobs.length} gespeicherte Job${favJobs.length !== 1 ? 's' : ''}</p>
+      </div>
+      <section class="jobs-section">
+        <div class="jobs-grid">
+          ${favJobs.length ? favJobs.map(j => `
+            <a href="#job/${j.id}" class="job-card">
+              <div class="job-card-header">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span class="job-card-cat-icon">${this.categoryIcons[j.category] || '📋'}</span>
+                  <h3>${this.esc(j.title)}</h3>
+                </div>
+                <button class="btn-fav active" onclick="App.toggleFavorite(${j.id}, event)">❤️</button>
+              </div>
+              <div class="job-card-body">
+                <p>${this.esc(j.description.slice(0, 100))}...</p>
+                <div class="job-meta">
+                  <span>📍 ${this.esc(j.location)}</span>
+                  <span>${this.esc(j.category)}</span>
+                </div>
+              </div>
+              <div class="job-card-footer">
+                <div class="job-price">${j.price} CHF <small>/ ${j.priceType === 'stunde' ? 'Std.' : 'Pauschal'}</small></div>
+                <span class="btn btn-primary btn-sm">Ansehen</span>
+              </div>
+            </a>`).join('') : '<div class="empty-state" style="grid-column:1/-1"><p>Noch keine Favoriten gespeichert.</p><a href="#jobs" class="btn btn-primary btn-sm">Jobs durchsuchen</a></div>'}
+        </div>
+      </section>
+      ${this.footerHtml()}`;
   },
 
   // --- Job Detail ---
@@ -425,25 +649,40 @@ const App = {
     el.innerHTML = `
       <div class="job-detail">
         <a href="#jobs" class="job-detail-back">&larr; Zurück zu allen Jobs</a>
-        <h1>${this.esc(job.title)}</h1>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <span style="font-size:2rem">${this.categoryIcons[job.category] || '📋'}</span>
+          <h1 style="margin:0">${this.esc(job.title)}</h1>
+        </div>
         <div class="job-detail-meta">
           <span class="badge ${job.type === 'regelmaessig' ? 'badge-blue' : 'badge-green'}">${job.type === 'regelmaessig' ? 'Regelmässig' : 'Einmalig'}</span>
-          <span>${this.esc(job.category)}</span>
-          <span>${this.esc(job.location)}</span>
-          <span>Erstellt: ${job.date}</span>
+          <span>${this.categoryIcons[job.category] || ''} ${this.esc(job.category)}</span>
+          <span>📍 ${this.esc(job.location)}</span>
+          <span>📅 Erstellt: ${job.date}</span>
+          ${job.deadline ? `<span>⏰ Frist: ${job.deadline}</span>` : ''}
         </div>
 
         <div class="job-detail-sidebar">
           <div class="price">${job.price} CHF <small>/ ${job.priceType === 'stunde' ? 'Stunde' : 'Pauschal'}</small></div>
-          <p style="font-size:.8rem;color:var(--gray-400);margin-bottom:8px">zzgl. ${job.priceType === 'stunde' ? '20' : '10'}% Vermittlungsgebühr bei Abschluss</p>
-          <div class="posted-by">Angeboten von <strong>${this.esc(job.postedBy)}</strong></div>
+          <p style="font-size:.8rem;color:var(--gray-400);margin-bottom:12px">zzgl. ${job.priceType === 'stunde' ? '20' : '10'}% Vermittlungsgebühr bei Abschluss</p>
+          <div class="posted-by">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+              <div class="avatar">${job.postedBy.charAt(0).toUpperCase()}</div>
+              <div>
+                <strong>${this.esc(job.postedBy)}</strong>
+                <p style="font-size:.8rem;color:var(--gray-400);margin:0">Mitglied seit 2026</p>
+              </div>
+            </div>
+          </div>
           ${job.status !== 'offen'
-            ? `<span class="badge badge-orange">Vergeben</span>`
+            ? `<span class="badge badge-orange" style="display:block;text-align:center;padding:12px">Vergeben an ${this.esc(job.acceptedApplicant || '')}</span>`
             : isOwner
-              ? `<p style="color:var(--gray-500);font-size:.9rem">Dies ist dein Job. ${job.applicants?.length || 0} Bewerber.</p>`
+              ? `<p style="color:var(--gray-500);font-size:.9rem">${job.applicants?.length || 0} Bewerber für deinen Job.</p>`
               : hasApplied
-                ? `<p style="color:var(--green);font-weight:600">Du hast dich bereits beworben!</p>`
-                : `<button class="btn btn-primary" style="width:100%" onclick="App.applyToJob(${job.id})">Jetzt bewerben</button>`}
+                ? `<div style="background:var(--green-light);color:var(--green);padding:12px;border-radius:8px;text-align:center;font-weight:600">Du hast dich bereits beworben!</div>`
+                : `<button class="btn btn-primary" style="width:100%" onclick="App.showApplyModal(${job.id})">Jetzt bewerben</button>
+                   <button class="btn btn-secondary" style="width:100%;margin-top:8px" onclick="App.toggleFavorite(${job.id})">
+                     ${this.isFavorite(job.id) ? '❤️ Aus Favoriten entfernen' : '🤍 Zu Favoriten hinzufügen'}
+                   </button>`}
         </div>
 
         <div class="job-detail-description">${this.esc(job.description).replace(/\n/g, '<br>')}</div>
@@ -451,45 +690,87 @@ const App = {
         ${isOwner && job.applicants?.length ? `
           <h3 style="margin-bottom:12px">Bewerber (${job.applicants.length})</h3>
           ${job.applicants.map(a => `
-            <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <strong>${this.esc(a.name)}</strong>
-                <p style="font-size:.85rem;color:var(--gray-500)">${this.esc(a.message)}</p>
+            <div class="applicant-card">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="avatar">${a.name.charAt(0).toUpperCase()}</div>
+                <div>
+                  <strong>${this.esc(a.name)}</strong>
+                  <p style="font-size:.85rem;color:var(--gray-500);margin:0">${this.esc(a.message)}</p>
+                </div>
               </div>
               ${job.status === 'offen' ? `<button class="btn btn-primary btn-sm" onclick="App.acceptApplicant(${job.id},'${this.esc(a.name)}')">Annehmen</button>` : ''}
             </div>`).join('')}` : ''}
       </div>
-      <div class="footer">2026 SwissSideJob. Alle Rechte vorbehalten.</div>`;
+
+      <!-- Bewerbungs-Modal -->
+      <div class="modal-overlay" id="applyModal">
+        <div class="modal">
+          <div class="modal-header">
+            <h2>Bewerbung senden</h2>
+            <button class="modal-close" onclick="App.closeApplyModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p style="color:var(--gray-500);margin-bottom:20px">Stelle dich kurz vor und erkläre warum du für diesen Job geeignet bist.</p>
+            <form onsubmit="App.submitApplication(event, ${id})">
+              <div class="form-group">
+                <label>Deine Nachricht</label>
+                <textarea id="applyMessage" required placeholder="Hallo! Ich habe Interesse an diesem Job weil..." style="min-height:120px"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Verfügbarkeit</label>
+                <input type="text" id="applyAvailability" placeholder="z.B. Mo-Fr ab 17 Uhr, Wochenende ganztags">
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%">Bewerbung absenden</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      ${this.footerHtml()}`;
   },
 
-  async applyToJob(id) {
+  showApplyModal(id) {
     if (!this.currentUser) {
       this.toast('Bitte melde dich zuerst an.', 'error');
       location.hash = '#login';
       return;
     }
+    document.getElementById('applyModal').classList.add('active');
+  },
 
-    const message = prompt('Kurze Nachricht an den Anbieter:');
-    if (message === null) return;
+  closeApplyModal() {
+    document.getElementById('applyModal').classList.remove('active');
+  },
+
+  async submitApplication(e, id) {
+    e.preventDefault();
+    const message = document.getElementById('applyMessage').value.trim();
+    const availability = document.getElementById('applyAvailability').value.trim();
+    const fullMessage = availability ? `${message}\n\nVerfügbarkeit: ${availability}` : message;
 
     try {
       await this.api('/api/jobs/' + id + '/apply', {
         method: 'POST',
-        body: JSON.stringify({ message: message || 'Ich habe Interesse!' })
+        body: JSON.stringify({ message: fullMessage })
       });
 
       const job = this.jobs.find(j => j.id === id);
       if (job) {
         if (!job.applicants) job.applicants = [];
-        job.applicants.push({ name: this.currentUser.name, message: message || 'Ich habe Interesse!' });
+        job.applicants.push({ name: this.currentUser.name, message: fullMessage });
         this.saveData();
       }
 
-      this.toast('Bewerbung gesendet!', 'success');
+      this.closeApplyModal();
+      this.toast('Bewerbung erfolgreich gesendet!', 'success');
       this.router();
     } catch (err) {
       this.toast(err.message, 'error');
     }
+  },
+
+  async applyToJob(id) {
+    this.showApplyModal(id);
   },
 
   async acceptApplicant(jobId, name) {
@@ -547,15 +828,8 @@ const App = {
               <label>Kategorie</label>
               <select id="jobCategory" required>
                 <option value="">Wählen...</option>
-                <option>Garten</option>
-                <option>Haushalt</option>
-                <option>Transport</option>
-                <option>Nachhilfe</option>
-                <option>Haustiere</option>
-                <option>Digital</option>
-                <option>Handwerk</option>
-                <option>Events</option>
-                <option>Sonstiges</option>
+                ${Object.entries(this.categoryIcons).map(([name, icon]) =>
+                  `<option value="${name}">${icon} ${name}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
@@ -576,12 +850,18 @@ const App = {
               </select>
             </div>
           </div>
-          <div class="form-group">
-            <label>Typ</label>
-            <select id="jobType" required>
-              <option value="einmalig">Einmalig</option>
-              <option value="regelmaessig">Regelmässig</option>
-            </select>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Typ</label>
+              <select id="jobType" required>
+                <option value="einmalig">Einmalig</option>
+                <option value="regelmaessig">Regelmässig</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Frist / Gewünschtes Datum</label>
+              <input type="date" id="jobDeadline" placeholder="Optional">
+            </div>
           </div>
 
           <label style="display:block;font-size:.85rem;font-weight:600;color:var(--gray-700);margin-bottom:12px">Inserat-Paket wählen</label>
@@ -634,6 +914,7 @@ const App = {
       type: document.getElementById('jobType').value,
       price: parseInt(document.getElementById('jobPrice').value),
       priceType: document.getElementById('jobPriceType').value,
+      deadline: document.getElementById('jobDeadline').value || '',
     };
 
     localStorage.setItem('sj_pending_job', JSON.stringify(jobData));
@@ -794,7 +1075,7 @@ const App = {
           </a>
         </div>
 
-        <div class="footer">2026 SwissSideJob. Alle Rechte vorbehalten.</div>
+        ${this.footerHtml()}
       </div>`;
   },
 
@@ -914,7 +1195,7 @@ const App = {
           ${myApplied.length ? myApplied.map(j => this.jobCardHtml(j)).join('') : '<div class="empty-state" style="grid-column:1/-1"><p>Du hast dich noch nicht beworben.</p><a href="#jobs" class="btn btn-primary btn-sm">Jobs durchsuchen</a></div>'}
         </div>
       </section>
-      <div class="footer">2026 SwissSideJob. Alle Rechte vorbehalten.</div>`;
+      ${this.footerHtml()}`;
   },
 
   switchTab(btn, tab) {
@@ -928,14 +1209,17 @@ const App = {
     return `
       <a href="#job/${j.id}" class="job-card">
         <div class="job-card-header">
-          <h3>${this.esc(j.title)}</h3>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="job-card-cat-icon">${this.categoryIcons[j.category] || '📋'}</span>
+            <h3>${this.esc(j.title)}</h3>
+          </div>
           <span class="badge ${j.status === 'offen' ? 'badge-green' : 'badge-orange'}">${j.status === 'offen' ? 'Offen' : 'Vergeben'}</span>
         </div>
         <div class="job-card-body">
           <p>${this.esc(j.description.slice(0, 100))}...</p>
           <div class="job-meta">
-            <span>${this.esc(j.location)}</span>
-            <span>${j.applicants?.length || 0} Bewerber</span>
+            <span>📍 ${this.esc(j.location)}</span>
+            <span>👥 ${j.applicants?.length || 0} Bewerber</span>
           </div>
         </div>
         <div class="job-card-footer">
